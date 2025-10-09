@@ -11,6 +11,7 @@ use Illuminate\Foundation\Auth\Access\AuthorizesRequests;
 use Illuminate\Foundation\Bus\DispatchesJobs;
 use Illuminate\Foundation\Validation\ValidatesRequests;
 use Illuminate\Routing\Controller as BaseController;
+use Illuminate\Auth\Access\AuthorizationException;
 
 abstract class Controller extends BaseController
 {
@@ -66,12 +67,16 @@ abstract class Controller extends BaseController
             return sendApiError('CRUD service not initialized', 500);
         }
 
-        $items = $this->service->all($this->with, $this->orderBy);
+        try {
+            $items = $this->service->all($this->with, $this->orderBy);
 
-        return sendApiResponse(
-            [$this->resourceName => $this->transform($items)],
-            ucfirst($this->resourceName) . ' fetched successfully.'
-        );
+            return sendApiResponse(
+                [$this->resourceName => $this->transform($items)],
+                ucfirst($this->resourceName) . ' fetched successfully.'
+            );
+        } catch (AuthorizationException $e) {
+            return sendApiError($e->getMessage(), 403);
+        }
     }
 
     public function show($id)
@@ -80,15 +85,19 @@ abstract class Controller extends BaseController
             return sendApiError('CRUD service not initialized', 500);
         }
 
-        $item = $this->service->find($id, $this->with);
-        if (!$item) {
-            return sendApiError('Not found', 404);
-        }
+        try {
+            $item = $this->service->find($id, $this->with);
+            if (!$item) {
+                return sendApiError('Not found', 404);
+            }
 
-        return sendApiResponse(
-            [$this->resourceName => $this->transform($item)],
-            ucfirst($this->resourceName) . ' retrieved successfully.'
-        );
+            return sendApiResponse(
+                [$this->resourceName => $this->transform($item)],
+                ucfirst($this->resourceName) . ' retrieved successfully.'
+            );
+        } catch (AuthorizationException $e) {
+            return sendApiError($e->getMessage(), 403);
+        }
     }
 
     public function store(Request $request)
@@ -99,6 +108,7 @@ abstract class Controller extends BaseController
 
         try {
             $item = $this->service->create($request->all());
+
             return sendApiResponse(
                 [$this->resourceName => $this->transform($item)],
                 ucfirst($this->resourceName) . ' created successfully.',
@@ -108,6 +118,8 @@ abstract class Controller extends BaseController
             return sendApiError('Validation failed', 422, $e->errors());
         } catch (QueryException $e) {
             return sendApiError('Failed to create record', 500, $e->getMessage());
+        } catch (AuthorizationException $e) {
+            return sendApiError($e->getMessage(), 403);
         }
     }
 
@@ -122,6 +134,7 @@ abstract class Controller extends BaseController
             if (!$item) {
                 return sendApiError('Not found', 404);
             }
+
             return sendApiResponse(
                 [$this->resourceName => $this->transform($item)],
                 ucfirst($this->resourceName) . ' updated successfully.'
@@ -130,6 +143,8 @@ abstract class Controller extends BaseController
             return sendApiError('Validation failed', 422, $e->errors());
         } catch (QueryException $e) {
             return sendApiError('Failed to update record', 500, $e->getMessage());
+        } catch (AuthorizationException $e) {
+            return sendApiError($e->getMessage(), 403);
         }
     }
 
@@ -144,9 +159,12 @@ abstract class Controller extends BaseController
             if (!$deleted) {
                 return sendApiError('Not found', 404);
             }
+
             return sendApiResponse(null, ucfirst($this->resourceName) . ' deleted successfully.');
         } catch (QueryException $e) {
             return sendApiError('Failed to delete record', 500, $e->getMessage());
+        } catch (AuthorizationException $e) {
+            return sendApiError($e->getMessage(), 403);
         }
     }
 }

@@ -6,6 +6,8 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Validation\ValidationException;
 use Illuminate\Support\Facades\Validator;
+use Illuminate\Support\Facades\Auth;
+use Illuminate\Auth\Access\AuthorizationException;
 
 class CrudService
 {
@@ -20,16 +22,25 @@ class CrudService
 
     public function all(array $with = [], string $orderBy = null): Collection
     {
+        $this->authorize('viewAny', $this->model);
+
         $query = $this->model->with($with);
         if ($orderBy) {
             $query->orderBy($orderBy, 'desc');
         }
+
         return $query->get();
     }
 
     public function find($id, array $with = []): ?Model
     {
-        return $this->model->with($with)->find($id);
+        $record = $this->model->with($with)->find($id);
+
+        if ($record) {
+            $this->authorize('view', $record);
+        }
+
+        return $record;
     }
 
     protected function validate(array $data): array
@@ -42,11 +53,35 @@ class CrudService
         if ($validator->fails()) {
             throw new ValidationException($validator);
         }
+
         return $validator->validated();
+    }
+
+    protected function authorize(string $action, $modelOrClass = null): void
+    {
+        $modelOrClass = $modelOrClass ?? $this->model;
+
+        $user = Auth::user();
+        if (!$user) {
+            throw new AuthorizationException("Unauthorized.");
+        }
+
+        $modelName = $modelOrClass instanceof Model
+            ? class_basename($modelOrClass)
+            : class_basename($modelOrClass);
+
+        $permissionName = strtolower($action) . '.' . strtolower($modelName);
+
+        if (!$user->hasPermission($permissionName)) {
+            throw new AuthorizationException(
+                "You do not have permission to {$action} {$modelName}."
+            );
+        }
     }
 
     public function create(array $data): Model
     {
+        $this->authorize('create', $this->model);
         $validated = $this->validate($data);
         return $this->model->create($validated);
     }
@@ -58,6 +93,7 @@ class CrudService
             return null;
         }
 
+        $this->authorize('update', $record);
         $validated = $this->validate($data);
         $record->update($validated);
 
@@ -70,6 +106,8 @@ class CrudService
         if (!$record) {
             return false;
         }
+
+        $this->authorize('delete', $record);
         return (bool) $record->delete();
     }
 
