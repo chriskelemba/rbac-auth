@@ -1,5 +1,11 @@
 # Changelog
 
+## [1.0.1] - 2025-10-09
+
+### Bugfixes
+- Fixed permission checks now properly restricting unauthorized access
+- Improved policy enforcement to prevent unauthorized operations
+
 ## [1.0.0] - 2025-10-09
 
 ### Added
