@@ -8,3 +8,9 @@ Provides user, role, and permission management with policies.
 1. Require the package via Composer (for local development, use path repository):
 ```bash
 composer require stl/rbac-auth
+```
+
+2. Seed the database with default roles and permissions:
+```bash
+php artisan rbac:seed
+```
