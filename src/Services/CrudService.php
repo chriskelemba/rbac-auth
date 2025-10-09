@@ -57,7 +57,7 @@ class CrudService
         return $validator->validated();
     }
 
-    protected function authorize(string $action, $modelOrClass = null): void
+    protected function authorize(string $action, $modelOrClass = null, bool $mapViewAny = false): void
     {
         $modelOrClass = $modelOrClass ?? $this->model;
 
@@ -70,7 +70,11 @@ class CrudService
             ? class_basename($modelOrClass)
             : class_basename($modelOrClass);
 
+        // Map viewAny to view for permissions
         $permissionName = strtolower($action) . '.' . strtolower($modelName);
+        if ($mapViewAny && $action === 'viewAny') {
+            $permissionName = 'view.' . strtolower($modelName);
+        }
 
         if (!$user->hasPermission($permissionName)) {
             throw new AuthorizationException(
