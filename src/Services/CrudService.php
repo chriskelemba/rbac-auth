@@ -22,7 +22,7 @@ class CrudService
 
     public function all(array $with = [], string $orderBy = null): Collection
     {
-        $this->authorize('viewAny', $this->model);
+        $this->authorize('viewAny', $this->model, true);
 
         $query = $this->model->with($with);
         if ($orderBy) {
@@ -70,7 +70,6 @@ class CrudService
             ? class_basename($modelOrClass)
             : class_basename($modelOrClass);
 
-        // Map viewAny to view for permissions
         $permissionName = strtolower($action) . '.' . strtolower($modelName);
         if ($mapViewAny && $action === 'viewAny') {
             $permissionName = 'view.' . strtolower($modelName);
