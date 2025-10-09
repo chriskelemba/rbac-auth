@@ -1,0 +1,38 @@
+{
+    "name": "stl/rbac-auth",
+    "description": "RBAC and authentication package.",
+    "type": "library",
+    "license": "MIT",
+    "authors": [
+        {
+            "name": "Chris",
+            "email": "chriskelemba@gmail.com",
+            "homepage": "https://github.com/chriskelemba"
+        }
+    ],
+    "require": {
+        "php": "^8.2",
+        "illuminate/support": "^12.0",
+        "illuminate/auth": "^12.0",
+        "illuminate/contracts": "^12.0",
+        "illuminate/database": "^12.0",
+        "laravel/sanctum": "^4.0"
+    },
+    "autoload": {
+        "psr-4": {
+            "RbacAuth\\": "src/"
+        },
+        "files": [
+            "src/Helpers/Helper.php"
+        ]
+    },
+    "extra": {
+        "laravel": {
+            "providers": [
+                "RbacAuth\\Providers\\AuthServiceProvider"
+            ]
+        }
+    },
+    "minimum-stability": "dev",
+    "prefer-stable": true
+}
