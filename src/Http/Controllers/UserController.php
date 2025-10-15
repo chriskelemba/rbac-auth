@@ -8,8 +8,10 @@ use RbacAuth\Models\User;
 
 class UserController extends Controller
 {    
-    public function fetchUserRoles(User $user)
+    public function fetchUserRoles($userId)
     {
+        $user = User::with('roles.permissions')->findOrFail($userId);
+
         $this->authorize('view', $user);
 
         return sendApiResponse(
@@ -19,8 +21,10 @@ class UserController extends Controller
         );
     }
 
-    public function assignRole(User $user, $roleId)
+    public function assignRole($userId, $roleId)
     {
+        $user = User::with('roles.permissions')->findOrFail($userId);
+
         $this->authorize('assignRole', $user);
 
         $user->roles()->syncWithoutDetaching([
@@ -28,6 +32,7 @@ class UserController extends Controller
                 'start_date' => now()->toDateString(),
             ],
         ]);
+
         $user->load('roles.permissions');
 
         return sendApiResponse(
@@ -37,8 +42,10 @@ class UserController extends Controller
         );
     }
 
-    public function revokeRole(User $user, $roleId)
+    public function revokeRole($userId, $roleId)
     {
+        $user = User::with('roles.permissions')->findOrFail($userId);
+
         $this->authorize('revokeRole', $user);
 
         $user->roles()->detach($roleId);
