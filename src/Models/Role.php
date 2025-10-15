@@ -18,7 +18,7 @@ class Role extends Model
             User::class,
             'role_user',
             'role_id',
-            'user_id'      // foreign key on pivot for User
+            'user_id'
         );
     }
 
