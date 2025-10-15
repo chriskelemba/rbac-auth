@@ -3,6 +3,10 @@
 namespace RbacAuth\Providers;
 
 use RbacAuth\Console\RbacSeedCommand;
+use Illuminate\Support\Facades\Route;
+use RbacAuth\Models\Role;
+use RbacAuth\Models\Permission;
+use RbacAuth\Models\User;
 use Illuminate\Foundation\Support\Providers\AuthServiceProvider as ServiceProvider;
 
 class AuthServiceProvider extends ServiceProvider
@@ -39,6 +43,10 @@ class AuthServiceProvider extends ServiceProvider
         $this->registerPolicies();
 
         $this->loadRoutesFrom(__DIR__ . '/../routes/api.php');
+
+        Route::model('role', Role::class);
+        Route::model('permission', Permission::class);
+        Route::model('user', User::class);
 
         $this->loadMigrationsFrom(__DIR__ . '/../../database/migrations');
     }
