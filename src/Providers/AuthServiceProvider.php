@@ -7,6 +7,9 @@ use Illuminate\Support\Facades\Route;
 use RbacAuth\Models\Role;
 use RbacAuth\Models\Permission;
 use RbacAuth\Models\User;
+use RbacAuth\Policies\RolePolicy;
+use RbacAuth\Policies\PermissionPolicy;
+use RbacAuth\Policies\UserPolicy;
 use Illuminate\Foundation\Support\Providers\AuthServiceProvider as ServiceProvider;
 
 class AuthServiceProvider extends ServiceProvider
