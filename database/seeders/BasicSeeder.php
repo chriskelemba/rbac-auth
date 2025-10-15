@@ -21,6 +21,7 @@ class BasicSeeder extends Seeder
             ['name' => 'create.user', 'description' => 'Can create users',     'type' => 'policy', 'model' => User::class],
             ['name' => 'update.user', 'description' => 'Can update users',     'type' => 'policy', 'model' => User::class],
             ['name' => 'delete.user', 'description' => 'Can delete users',     'type' => 'policy', 'model' => User::class],
+            ['name' => 'manage.user', 'description' => 'Can manage users',     'type' => 'policy', 'model' => User::class],
 
             ['name' => 'view.role',   'description' => 'Can view roles',       'type' => 'policy', 'model' => Role::class],
             ['name' => 'create.role', 'description' => 'Can create roles',     'type' => 'policy', 'model' => Role::class],
