@@ -2,14 +2,16 @@
 
 namespace RbacAuth\Providers;
 
+use Illuminate\Routing\Router;
+use Illuminate\Foundation\Support\Providers\AuthServiceProvider as ServiceProvider;
 use RbacAuth\Console\RbacSeedCommand;
+use RbacAuth\Http\Middleware\RoleMiddleware;
 use RbacAuth\Models\Role;
 use RbacAuth\Models\Permission;
 use RbacAuth\Models\User;
 use RbacAuth\Policies\RolePolicy;
 use RbacAuth\Policies\PermissionPolicy;
 use RbacAuth\Policies\UserPolicy;
-use Illuminate\Foundation\Support\Providers\AuthServiceProvider as ServiceProvider;
 
 class AuthServiceProvider extends ServiceProvider
 {
@@ -35,7 +37,7 @@ class AuthServiceProvider extends ServiceProvider
     /**
      * Bootstrap any package services.
      */
-    public function boot(): void
+    public function boot(Router $router): void
     {
         if ($this->app->runningInConsole()) {
             $this->commands([
@@ -47,5 +49,7 @@ class AuthServiceProvider extends ServiceProvider
         $this->loadRoutesFrom(__DIR__ . '/../routes/api.php');
 
         $this->loadMigrationsFrom(__DIR__ . '/../../database/migrations');
+
+        $router->aliasMiddleware('role', RoleMiddleware::class);
     }
 }
