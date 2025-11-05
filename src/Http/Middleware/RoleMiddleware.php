@@ -9,12 +9,17 @@ class RoleMiddleware
 {
     /**
      * Handle an incoming request.
-     *
-     * @param  \Closure(\Illuminate\Http\Request): (\Symfony\Component\HttpFoundation\Response)  $next
      */
     public function handle(Request $request, Closure $next, ...$roles)
     {
         $user = $request->user();
+
+        $roles = collect($roles)
+            ->flatMap(fn ($r) => preg_split('/[|,]/', $r))
+            ->filter()
+            ->unique()
+            ->values()
+            ->toArray();
 
         if (! $user || ! $user->hasAnyRole($roles)) {
             return response()->json([
