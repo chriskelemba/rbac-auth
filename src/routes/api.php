@@ -49,7 +49,7 @@ Route::prefix('api')->group(function () {
         /**
          * Admin: Limited access (can only manage users, not roles or permissions)
          */
-        Route::middleware(['role:admin,super-admin'])->group(function () {
+        Route::middleware(['role:admin|super-admin'])->group(function () {
             // Admins can manage users, but not system roles or permissions
             Route::get('users', [UserController::class, 'index']);
             Route::get('users/{user}', [UserController::class, 'show']);
